@@ -2,10 +2,10 @@
     "C_Cpp.default.configurationProvider": "ms-vscode.makefile-tools",
     "makefile.launchConfigurations": [
 
-        {
+        {            
             "cwd": "/Users/ricardo/desenv/clox/build",
             "binaryPath": "/Users/ricardo/desenv/clox/build/main",
-            "binaryArgs": []
+            "binaryArgs": ["../teste/teste.clox"],
         }
     ],
     "C_Cpp.errorSquiggles": "disabled"

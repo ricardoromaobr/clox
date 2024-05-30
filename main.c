@@ -17,6 +17,7 @@ static void repl()
             printf("\n");
             break;
         }
+        
         interpret(line);
     }
 }
@@ -39,7 +40,7 @@ static char* readFile(const char *path)
         fprintf(stderr, "Not enough memory to read \"%s\".\n", path); 
         exit(74);
     }
-    size_t bytesRead = fread(buffer, filesize, file);
+    size_t bytesRead = fread(buffer,sizeof(char), fileSize, file);
     if (bytesRead < fileSize) {
         fprintf(stderr, "Could not read file \"%s\".\n", path);
         exit(74);
@@ -58,34 +59,19 @@ static void runFile(const char *path)
     if (result == INTERPRET_RUNTIME_ERROR) exit (70);
 } 
 
-
 int main(int argc, const char *argv[])
 {
     initVM();
-    Chunk chunk;
-    initChunk(&chunk);
-    int constant = addConstant(&chunk, 1.2);
-    writeChunk(&chunk, OP_CONSTANT, 123);
-    writeChunk(&chunk, constant, 123);
+    if (argc == 1) {
+        repl();
+    } else if (argc == 2) {
+        runFile(argv[1]);
+    } else {
+        fprintf(stderr, "Usage: clox [path]\n");
+        exit(64);
+    }
 
-    constant = addConstant(&chunk, 3.4);
-    writeChunk(&chunk, OP_CONSTANT, 123);
-    writeChunk(&chunk, constant, 123);
-
-    writeChunk(&chunk, OP_ADD, 124);
-
-     constant = addConstant(&chunk, 5.6);
-    writeChunk(&chunk, OP_CONSTANT, 125);
-    writeChunk(&chunk, constant, 125);
-
-    writeChunk(&chunk, OP_DIVIDE, 126);
-
-    writeChunk(&chunk, OP_NEGATE, 123);
-    writeChunk(&chunk, OP_RETURN, 123);
-    disassembleChunk(&chunk, "test chunk");
-    interpret(&chunk);
     freeVM();
     
-    freeChunk(&chunk);
     return 0;
 }
