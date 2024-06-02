@@ -4,6 +4,7 @@
 #include "memory.h"
 #include "object.h"
 #include "value.h"
+#include "table.h"
 
 #define TABLE_MAX_LOAD 0.75
 
@@ -24,13 +25,14 @@ static Entry* findEntry(Entry* entities, int capacity, ObjString* key) {
 
     for (;;) {
         Entry* entry = &entities[index];
-        if (entry->key == key || entry->key == NULL) {
-            if (IS_NIL(entry->key)) {
+        if (entry->key == NULL) {
+            if (IS_NIL(entry->value)) {
                 return tombstone != NULL ? tombstone : entry;
             } else {
-                if (tombstone == NULL) tombstone = entry;
-                if (entry->key == key) return entry;
+                if (tombstone == NULL) tombstone = entry;                
             }
+        } else if (entry->key == key) {
+            return entry;
         }
         index = (index + 1) % capacity;
     } 
@@ -99,6 +101,29 @@ void tableAddAll(Table* from, Table* to) {
         if (entry->key != NULL) {
             tableSet(to, entry->key, entry->value);
         }
+    }
+}
+
+ObjString* tableFindString(Table* table, const char* chars, int length, uint32_t hash) {
+
+    if (table->count == 0)  return NULL; 
+
+    uint32_t index = hash % table->capacity; 
+
+    for (;;) {
+        Entry* entry = &table[index];
+        if (entry->key == NULL) {
+            // stop if we find an empty non-tombstone entry
+            if (IS_NIL(entry->key)) return NULL;
+
+        } else if (entry->key->length == length && 
+                    entry->key->hash == hash && 
+                        memcmp(entry->key->chars, chars, length) == 0) {
+                // we found it
+            return entry->key;
+        }
+
+        index = (index + 1) % table->capacity;
     }
 }
 
