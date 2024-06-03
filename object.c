@@ -28,7 +28,7 @@ static ObjString* allocateString(char *chars, int length, uint32_t hash)
     return string;
 }
 
-static uint32_t hashstring(const char* key, int length) {
+static uint32_t hashString(const char* key, int length) {
     uint32_t hash = 2166136261u;
     for (int i = 0; i < length; i++) {
         hash ^= (uint8_t) key[i];

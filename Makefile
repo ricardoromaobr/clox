@@ -2,12 +2,13 @@ CFLAGS= -g -Wall
 
 all: main
 
-main: main.o chunk.o memory.o debug.o value.o vm.o compiler.o scanner.o object.o
+main: main.o chunk.o memory.o debug.o value.o vm.o compiler.o scanner.o object.o table.o
 	gcc $(CFLAGS) ./build/main.o ./build/chunk.o  \
 					./build/memory.o ./build/debug.o \
 					./build/value.o ./build/vm.o \
 					./build/scanner.o ./build/compiler.o \
 					./build/object.o \
+					./build/table.o \
 					-o ./build/main
 
 main.o: main.c 
@@ -36,6 +37,9 @@ compiler.o: compiler.c
 
 object.o: object.c
 	gcc $(CFLAGS) -c object.c -o ./build/object.o
+
+table.o: table.c
+	gcc $(CFLAGS) -c table.c -o ./build/table.o
 
 clean:
 	rm -f ./build/*.o ./build/main
