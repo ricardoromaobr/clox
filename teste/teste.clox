@@ -1,2 +1,1 @@
-print 1 + 2; 
-print 3 + 4;
+a * b = c + d;
