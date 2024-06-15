@@ -1,5 +1,1 @@
-var a = 1; 
-if (a > 0)
-    print "a maior que 10"; 
-else
-    print "a não é maior que 10";
+true and false;
