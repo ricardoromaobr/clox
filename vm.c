@@ -26,7 +26,8 @@ static void runtimeError(const char* format, ...){
 
     size_t instruction = vm.ip - vm.chunk->code-1;
     int line = vm.chunk->lines[instruction];
-    fprintf(stderr,"[,j e %d] in script\n", line);
+    fprintf(stderr,"[line %d] in script\n", line);
+    
     resetStack();
 }
 void initVM()
@@ -124,12 +125,12 @@ static InterpretResult run()
             case OP_POP: pop(); break;
             case OP_GET_LOCAL: {
                 uint8_t slot = READ_BYTE();
-                push(vm.stackTop[slot]);
+                push(vm.stack[slot]);
                 break;
             }
             case OP_SET_LOCAL: {
                 uint8_t slot = READ_BYTE(); 
-                vm.stackTop[slot] = peek(0);
+                vm.stack[slot] = peek(0);
                 break;
             }
             case OP_GET_GLOBAL: {
@@ -146,6 +147,15 @@ static InterpretResult run()
                 ObjString* name = READ_STRING();
                 tableSet(&vm.globals, name, peek(0)); 
                 pop();
+                break;
+            }
+            case OP_SET_GLOBAL: {
+                ObjString* name = READ_STRING();
+                if (tableSet(&vm.globals, name, peek(0))) {
+                    tableDelete(&vm.globals, name);
+                    runtimeError("Undefined variable '%s'.", name->chars);
+                    return INTERPRET_RUNTIME_ERROR;
+                }
                 break;
             }
             case OP_EQUAL: {
@@ -199,6 +209,7 @@ static InterpretResult run()
             case OP_LOOP: {
                 uint16_t offset =  READ_SHORT();
                 vm.ip -= offset;
+                break;
             }
             case OP_RETURN:
               // exit interpreter.
