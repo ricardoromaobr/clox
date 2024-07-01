@@ -1,10 +1,6 @@
+fun areWeHavingItYet() {
+    print "Yes we are!";
+}
 
-// simple for 
-
-for (var i = 0; 
-     i < 2; 
-     i = i + 1)
-
-     print i;
-
-     
+var minhaFunc = areWeHavingItYet;
+print minhaFunc;
