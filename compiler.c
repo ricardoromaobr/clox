@@ -187,6 +187,7 @@ static void emitbytes(uint8_t byte1, uint8_t byte2)
 
 static void emitReturn()
 {
+    emitByte(OP_NIL);
     emitByte(OP_RETURN);
 }
 
@@ -237,7 +238,7 @@ static ObjFunction* endCompiler()
                 function->name->chars : "<script>");
     }
 #endif
-    current = current->enclosing;
+    current = &current->enclosing;
     return function;
 }
 
@@ -305,6 +306,26 @@ static void binary(bool canAssing)
     default:
         return; // unreachable.
     }
+}
+
+static uint8_t argumentList() {
+    uint8_t argCount = 0;
+    if (!check(TOKEN_RIGHT_PAREN)) {
+        do {
+            expression();    
+            if (argCount == 255) {
+                error("Can't have more than 255 arguments.");
+            }     
+            argCount++;
+        } while (match(TOKEN_COMMA));
+    }
+
+    consume(TOKEN_RIGHT_PAREN, "Expect ')' after arguments.");
+    return argCount;
+}
+static void call (bool canAssign) {
+    uint8_t argCount = argumentList(); 
+    emitbytes(OP_CALL, argCount);
 }
 
 static void literal(bool canAssign)
@@ -525,6 +546,8 @@ static void defineVariable(uint8_t global)
     emitbytes(OP_DEFINE_GLOBAL, global);
 }
 
+
+
 static void and_(bool canAssign)
 {
     int endJump = emitJump(OP_JUMP_IF_FALSE);
@@ -534,7 +557,7 @@ static void and_(bool canAssign)
 }
 
 ParseRule rules[] = {
-    [TOKEN_LEFT_PAREN] = {grouping, NULL, PREC_NONE},
+    [TOKEN_LEFT_PAREN] = {grouping, call, PREC_CALL},
     [TOKEN_RIGHT_PAREN] = {NULL, NULL, PREC_NONE},
     [TOKEN_LEFT_BRACE] = {NULL, NULL, PREC_NONE},
     [TOKEN_RIGHT_BRACE] = {NULL, NULL, PREC_NONE},
@@ -721,6 +744,18 @@ static void printStatement()
     emitByte(OP_PRINT);
 }
 
+static void returnStatement() {
+    if (current->type == TYPE_SCRIPT) {
+        error("Can't return from top-level code.");
+    }
+    if (match(TOKEN_SEMICOLON)) {
+        emitReturn();
+    } else {
+        expression();
+        consume(TOKEN_SEMICOLON, "Expect ';' after return value.");
+    }
+}
+
 static void whileStatement()
 {
     int loopStart = currentChunk()->count;
@@ -790,6 +825,9 @@ static void statement()
      else if (match(TOKEN_IF))
     {
         ifStatement();
+    }
+    else if (match(TOKEN_RETURN)){
+        returnStatement();
     }
     else if (match(TOKEN_WHILE))
     {

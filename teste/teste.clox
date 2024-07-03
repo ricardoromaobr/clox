@@ -1,6 +1,7 @@
-fun areWeHavingItYet() {
-    print "Yes we are!";
+print "ricardo";
+
+fun sum(a,b) {
+    print a + b; 
 }
 
-var minhaFunc = areWeHavingItYet;
-print minhaFunc;
+sum();
