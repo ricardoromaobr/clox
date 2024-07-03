@@ -91,7 +91,7 @@ static bool call(ObjFunction *function, int argCount)
         return false;
     }
 
-    CallFrame *frame = &vm.frames[vm.frameCount++];
+    CallFrame* frame = &vm.frames[vm.frameCount++];
     frame->function = function;
     frame->ip = function->chunk.code;
     frame->slots = vm.stackTop - argCount - 1;
@@ -347,7 +347,7 @@ InterpretResult interpret(const char *source)
     ObjFunction *function = compile(source);
     if (function == NULL)
         return INTERPRET_COMPILE_ERROR;
-    push(OBJ_VAL(function));
+    push(OBJ_VAL(function));    
     call(function, 0);
     return run();
 }

@@ -753,6 +753,7 @@ static void returnStatement() {
     } else {
         expression();
         consume(TOKEN_SEMICOLON, "Expect ';' after return value.");
+        emitReturn();
     }
 }
 
