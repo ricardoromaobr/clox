@@ -186,8 +186,7 @@ static void emitbytes(uint8_t byte1, uint8_t byte2)
 }
 
 static void emitReturn()
-{
-    emitByte(OP_NIL);
+{  
     emitByte(OP_RETURN);
 }
 
@@ -238,7 +237,7 @@ static ObjFunction* endCompiler()
                 function->name->chars : "<script>");
     }
 #endif
-    current = &current->enclosing;
+    current = current->enclosing;
     return function;
 }
 

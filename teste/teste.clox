@@ -1,7 +1,5 @@
-print "ricardo";
-
-fun sum(a,b) {
-    print a + b; 
+fun sum (a,b) {
+    return a + b;
 }
 
-sum();
+print 4 + sum(5,5);
