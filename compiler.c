@@ -187,6 +187,7 @@ static void emitbytes(uint8_t byte1, uint8_t byte2)
 
 static void emitReturn()
 {  
+    emitByte(OP_NIL);
     emitByte(OP_RETURN);
 }
 
@@ -752,7 +753,7 @@ static void returnStatement() {
     } else {
         expression();
         consume(TOKEN_SEMICOLON, "Expect ';' after return value.");
-        emitReturn();
+        emitByte(OP_RETURN);
     }
 }
 
