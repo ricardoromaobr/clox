@@ -22,6 +22,7 @@ static void resetStack()
 {
     vm.stackTop = vm.stack;
     vm.frameCount = 0;
+    vm.openUpvalues = NULL;
 }
 
 static void runtimeError(const char *format, ...)
@@ -37,15 +38,15 @@ static void runtimeError(const char *format, ...)
         CallFrame *frame = &vm.frames[i];
         ObjFunction *function = frame->closure->function;
         size_t instruction = frame->ip - frame->closure->function->chunk.code - 1;
-        int line = frame->function->chunk.lines[instruction];
+        int line = frame->closure->function->chunk.lines[instruction];
         fprintf(stderr, "[line %d] in ", line);
-        if (frame->function->name == NULL)
+        if (frame->closure->function->name == NULL)
         {
             fprintf(stderr, "script\n");
         }
         else
         {
-            fprintf(stderr, "%s()\n", frame->function->name->chars);
+            fprintf(stderr, "%s()\n", frame->closure->function->name->chars);
         }
     }
 
@@ -109,7 +110,7 @@ static bool call(ObjClosure *closure, int argCount)
     }
 
     CallFrame* frame = &vm.frames[vm.frameCount++];
-    frame->closure->function = function;
+    frame->closure = closure;
     frame->ip = closure->function->chunk.code;
     frame->slots = vm.stackTop - argCount - 1;
     return true;
@@ -138,6 +139,40 @@ static bool callValue(Value callee, int argCount)
 
     runtimeError("Can only call functions and classes.");
     return false;
+}
+
+static ObjUpvalue* captureUpvalue(Value* local) {
+    ObjUpvalue* prevUpvalue = NULL;
+    ObjUpvalue* upvalue = vm.openUpvalues;
+    while (upvalue != NULL && upvalue->location > local) {
+        prevUpvalue = upvalue;
+        upvalue = upvalue->next;
+    }
+
+    if (upvalue != NULL && upvalue->location == local) {
+        return upvalue;
+    }
+
+    ObjUpvalue* createdUpvalue = newUpvalue(local);
+    createdUpvalue->next = upvalue;
+
+    if (prevUpvalue == NULL) {
+        vm.openUpvalues = createdUpvalue;
+    } else {
+        prevUpvalue->next = createdUpvalue;
+    }
+
+    return createdUpvalue;
+}
+
+static void closeUpvalues(Value* last) {
+    while (vm.openUpvalues != NULL && 
+           vm.openUpvalues->location >= last) {
+        ObjUpvalue* upvalue = vm.openUpvalues;
+        upvalue->closed = *upvalue->location; 
+        upvalue->location  = &upvalue->closed;
+        vm.openUpvalues = upvalue->next;
+    }
 }
 
 static bool isFalsey(Value value)
@@ -258,6 +293,16 @@ static InterpretResult run()
                 }
                 break;
             }
+            case OP_GET_UPVALUE: {
+                uint8_t slot = READ_BYTE();
+                push(*frame->closure->upvalues[slot]->location);
+                break;
+            }
+            case OP_SET_UPVALUE: {
+                uint8_t slot = READ_BYTE();
+                *frame->closure->upvalues[slot]->location = peek(0);
+                break;
+            }
             case OP_EQUAL:
             {
                 Value a = pop();
@@ -348,10 +393,26 @@ static InterpretResult run()
                 ObjFunction* function = AS_FUNCTION(READ_CONSTANT());
                 ObjClosure* closure = newClosure(function);
                 push(OBJ_VAL(closure));
+                for (int i = 0; i < closure->upvalueCount; i++) {
+                    uint8_t isLocal = READ_BYTE(); 
+                    uint8_t index = READ_BYTE();
+
+                    if (isLocal) {
+                        closure->upvalues[i] = captureUpvalue(frame->closure->upvalues[index]);
+                    } else {
+                        closure->upvalues[i] = frame->closure->upvalues[index];
+                    }
+                }
+                break;
+            }
+            case OP_CLOSURE_UPVALUE: {
+                closeUpvalues(vm.stackTop - 1);
+                pop();            
                 break;
             }
             case OP_RETURN: {
                 Value result = pop();
+                closeUpvalues(frame->slots);
                 vm.frameCount--;
                 if (vm.frameCount == 0)
                 {
@@ -381,7 +442,7 @@ InterpretResult interpret(const char *source)
     push(OBJ_VAL(function));
     ObjClosure* closure = newClosure(function);
     pop();
-    push(OBJ_VAL(closure))    
+    push(OBJ_VAL(closure));    
     call(closure, 0);
     return run();
 }
