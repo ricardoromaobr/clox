@@ -1,5 +1,6 @@
-var inicio = clock();
-print "app running.."; 
-for (var i = 0; i < 10; i = i + 1)
-    print i;
-print clock() - inicio;
+fun teste()
+{
+    return 10;
+}
+
+print teste();
