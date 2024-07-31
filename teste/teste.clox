@@ -1,6 +1,16 @@
 fun teste()
 {
-    return 10;
+    var a = 10; 
+    var b = 5; 
+
+    fun soma()
+    {
+        a = a + 2;
+        return a + b;
+    }
+
+    return soma;
 }
 
-print teste();
+var s = teste();
+s();
