@@ -1,6 +1,10 @@
 #include <stdio.h>
 
 #include "common.h"
+#ifdef DEBUG_LOG_GC
+#include <stdio.h>
+#include "debug.h"
+#endif
 #include "compiler.h"
 #include "scanner.h"
 
