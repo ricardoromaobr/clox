@@ -17,6 +17,7 @@
 
 typedef enum
 {
+    OBJ_CLASS,
     OBJ_CLOSURE,
     OBJ_FUNCTION,
     OBJ_NATIVE,
@@ -68,6 +69,11 @@ typedef struct {
     ObjUpvalue** upvalues;
     int upvalueCount;
 } ObjClosure;
+
+typedef struct {
+    Obj obj; 
+    ObjString* name; 
+} ObjClass;
 
 ObjClosure* newClosure(ObjFunction* function);
 ObjFunction* newFunction();
