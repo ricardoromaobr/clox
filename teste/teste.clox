@@ -1,2 +1,2 @@
 class Pessoa {}
-print "fim";
+print Pessoa();
