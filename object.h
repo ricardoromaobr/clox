@@ -9,7 +9,7 @@
 #define IS_CLASS(value) isObjType(value, OBJ_CLASS)
 #define IS_CLOSURE(value) isObjType(value, OBJ_CLOSURE)
 #define IS_FUNCTION(value) isObjType(value, OBJ_FUNCTION)
-#define IS_INSTANCE(value) isObjType(value,Obj_INSTANCE)
+#define IS_INSTANCE(value) isObjType(value,OBJ_INSTANCE)
 #define IS_NATIVE(value) isObjType(value,OBJ_NATIVE)
 #define IS_STRING(value) isObjType(value, OBJ_STRING)
 #define AS_CLASS(value) ((ObjClass*) AS_OBJ(value))

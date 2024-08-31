@@ -1,2 +1,5 @@
 class Pessoa {}
-print Pessoa();
+
+var nome = "ricardo"; 
+nome.sobrenome = "romao";
+var pessoa = Pessoa(); 
