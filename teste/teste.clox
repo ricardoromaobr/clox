@@ -1,5 +1,10 @@
-class Pessoa {}
+class Pessoa {
 
-var nome = "ricardo"; 
-nome.sobrenome = "romao";
-var pessoa = Pessoa(); 
+    obterIdade() {
+        return 48;
+    }
+}
+var pessoa = Pessoa();
+var obterIdadde = pessoa.obterIdade;
+var idade = obterIdadde();
+print idade;
