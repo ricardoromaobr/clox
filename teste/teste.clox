@@ -1,10 +1,18 @@
 class Pessoa {
-
     obterIdade() {
         return 48;
     }
+
+    printInstance() {
+        print this;
+    }
 }
+
 var pessoa = Pessoa();
 var obterIdadde = pessoa.obterIdade;
 var idade = obterIdadde();
 print idade;
+
+pessoa.printInstance();
+
+

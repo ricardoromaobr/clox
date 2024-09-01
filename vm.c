@@ -13,7 +13,7 @@
 
 VM vm;
 
-static Value clockNative(int argCount, Value *args)
+static Value clockNative(int argCount, Value* args)
 {
     return NUMBER_VAL((double)clock() / CLOCKS_PER_SEC);
 }
@@ -142,27 +142,28 @@ static bool callValue(Value callee, int argCount)
         {
             case OBJ_BOUND_METHOD:{
                 ObjBoundMethod* bound = AS_BOUND_METHOD(callee);
+                vm.stackTop[-argCount - 1] = bound->receiver;
                 return call(bound->method, argCount);
             }            
-        case OBJ_FUNCTION:
-            return call(AS_FUNCTION(callee), argCount);
-        case OBJ_CLASS: {
-            ObjClass* klass = AS_CLASS(callee);
-            vm.stackTop[-argCount - 1] = OBJ_VAL(newInstance(klass));
-            return true;
-        }
-        case OBJ_CLOSURE:
-            return call(AS_CLOSURE(callee), argCount);    
-        case OBJ_NATIVE: {
-            NativeFn native = AS_NATIVE(callee);
-            Value result = native(argCount, vm.stackTop - argCount);
-            vm.stackTop -= argCount + 1;
-            push(result);
-            return true;
-        }
-        default:
-            break;
-        }
+            case OBJ_FUNCTION:
+                return call(AS_FUNCTION(callee), argCount);
+            case OBJ_CLASS: {
+                ObjClass* klass = AS_CLASS(callee);
+                vm.stackTop[-argCount - 1] = OBJ_VAL(newInstance(klass));
+                return true;
+            }
+            case OBJ_CLOSURE:
+                return call(AS_CLOSURE(callee), argCount);    
+            case OBJ_NATIVE: {
+                NativeFn native = AS_NATIVE(callee);
+                Value result = native(argCount, vm.stackTop - argCount);
+                vm.stackTop -= argCount + 1;
+                push(result);
+                return true;
+            }
+            default:
+                break;
+            }
     }
 
     runtimeError("Can only call functions and classes.");
