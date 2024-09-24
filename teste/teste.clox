@@ -1,18 +1,13 @@
-class Pessoa {
-    obterIdade() {
-        return 48;
+fun calValor(a,b)
+{
+
+    fun soma ()
+    {
+        return a + b ;
     }
 
-    printInstance() {
-        print this;
-    }
+    return soma();
 }
 
-var pessoa = Pessoa();
-var obterIdadde = pessoa.obterIdade;
-var idade = obterIdadde();
-print idade;
-
-pessoa.printInstance();
-
-
+var somaAb = calValor(2,3);
+print somaAb;

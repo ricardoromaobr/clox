@@ -484,11 +484,11 @@ static void dot(bool canAssign)
         expression();
         emitbytes(OP_SET_PROPERTY, name);
     }
-    // else if (match(TOKEN_LEFT_PAREN)) {
-    //     uint8_t argCount = argumentList();
-    //     emitbytes(OP_INVOKE, name);
-    //     emitByte(argCount);
-    // }
+    else if (match(TOKEN_LEFT_PAREN)) {
+        uint8_t argCount = argumentList();
+        emitbytes(OP_INVOKE, name);
+        emitByte(argCount);
+    }
     else
     {
         emitbytes(OP_GET_PROPERTY, name);
