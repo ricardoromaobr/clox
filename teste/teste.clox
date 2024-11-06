@@ -1,13 +1,20 @@
-fun calValor(a,b)
-{
+class Pessoa {
 
-    fun soma ()
+    imprimaNome ()
     {
-        return a + b ;
+        print "ricardo";
     }
-
-    return soma();
 }
 
-var somaAb = calValor(2,3);
-print somaAb;
+class Professora < Pessoa
+{
+    imprimeMarca()
+    {
+        print "marca";
+    }
+}
+
+var prof = Professora(); 
+prof.imprimaNome(); 
+prof.imprimeMarca();
+
