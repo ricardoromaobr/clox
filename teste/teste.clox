@@ -1,20 +1,20 @@
+
 class Pessoa {
 
-    imprimaNome ()
+    imprimaNome()
     {
+        print "nome";
+    }
+}
+
+class Professor < Pessoa {
+
+    imprimaNome()
+    {
+        super.imprimaNome();
         print "ricardo";
     }
 }
 
-class Professora < Pessoa
-{
-    imprimeMarca()
-    {
-        print "marca";
-    }
-}
-
-var prof = Professora(); 
-prof.imprimaNome(); 
-prof.imprimeMarca();
-
+var prof = Professor(); 
+prof.imprimaNome();

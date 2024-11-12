@@ -83,7 +83,7 @@ Parser parser;
 Compiler *current = NULL;
 ClassCompiler *currentClass = NULL;
 
-static Chunk* currentChunk()
+static Chunk *currentChunk()
 {
     return &current->function->chunk;
 }
@@ -484,7 +484,8 @@ static void dot(bool canAssign)
         expression();
         emitbytes(OP_SET_PROPERTY, name);
     }
-    else if (match(TOKEN_LEFT_PAREN)) {
+    else if (match(TOKEN_LEFT_PAREN))
+    {
         uint8_t argCount = argumentList();
         emitbytes(OP_INVOKE, name);
         emitByte(argCount);
@@ -635,32 +636,38 @@ static void variable(bool canAssign)
     namedVariable(parser.previous, canAssign);
 }
 
-static Token syntheticToken(const char* text)
+static Token syntheticToken(const char *text)
 {
     Token token;
-    token.start = text; 
+    token.start = text;
     token.length = (int)strlen(text);
     return token;
 }
 
 static void super_(bool canAssign)
 {
-    if (currentClass == null) {
+    if (currentClass == NULL)
+    {
         error("Can't use 'super' outside of a class.");
-    } else if (!currentClass->hasSuperclass) {
+    }
+    else if (!currentClass->hasSuperclass)
+    {
         error("Can't use 'super' in a class with no superclass.");
     }
-    Í
+
     consume(TOKEN_DOT, "Expect '.' after 'super'.");
-    consume(TOKEN_IDENTIFIER, "Expect superclass method name."); 
+    consume(TOKEN_IDENTIFIER, "Expect superclass method name.");
     uint8_t name = identifierConstant(&parser.previous);
-    namedVariable(syntheticToken("this"), false); 
-    if (match(TOKEN_LEFT_PAREN)) {
+    namedVariable(syntheticToken("this"), false);
+    if (match(TOKEN_LEFT_PAREN))
+    {
         uint8_t argCount = argumentList();
         namedVariable(syntheticToken("super"), false);
         emitbytes(OP_SUPER_INVOKE, name);
         emitByte(argCount);
-    } else {
+    }
+    else
+    {
         namedVariable(syntheticToken("super"), false);
         emitbytes(OP_GET_SUPER, name);
     }
@@ -831,22 +838,26 @@ static void classDeclaration()
     classCompiler.enclosing = currentClass;
     currentClass = &classCompiler;
 
-    if (match(TOKEN_LESS)) {
-        consume(TOKEN_IDENTIFIER,"Expect superclass name.");
+    if (match(TOKEN_LESS))
+    {
+        consume(TOKEN_IDENTIFIER, "Expect superclass name.");
         variable(false);
-        if (identifiersEqual(&className, &parser.previous)) {
+        if (identifiersEqual(&className, &parser.previous))
+        {
             error("A class can't inherit from itself.");
         }
-        namedVariable(className,false);
+        
+        beginScope();
+        addLocal(syntheticToken("super"));
+        defineVariable(0);
+
+        namedVariable(className, false);
         emitByte(OP_INHERIT);
         classCompiler.hasSuperclass = true;
     }
 
-    beginScope();
-    addLocal(syntheticToken("super"));
-    defineVariable(0);
+    namedVariable(className,false);
 
-    namedVariable(className, false);
     consume(TOKEN_LEFT_BRACE, "Expect '{' before class body.");
 
     while (!check(TOKEN_RIGHT_BRACE) && !check(TOKEN_EOF))
@@ -857,7 +868,8 @@ static void classDeclaration()
     consume(TOKEN_RIGHT_BRACE, "Expect '}' after class body.");
     emitByte(OP_POP);
 
-    if (classCompiler.hasSuperclass) {
+    if (classCompiler.hasSuperclass)
+    {
         endScope();
     }
 
@@ -982,7 +994,8 @@ static void returnStatement()
     }
     else
     {
-        if (current->type == TYPE_INITIALIZER) {
+        if (current->type == TYPE_INITIALIZER)
+        {
             error("Can't return a value from an initializer.");
         }
         expression();

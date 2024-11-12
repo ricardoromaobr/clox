@@ -443,7 +443,7 @@ static InterpretResult run()
         case OP_GET_SUPER:
         {
             ObjString *name = READ_STRING();
-            ObjClass *superClass = AS_CLASS(pop());
+            ObjClass *superclass = AS_CLASS(pop());
 
             if (!bindMethod(superclass, name))
             {
